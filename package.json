@@ -1,0 +1,25 @@
+{
+  "name": "video_room_ws",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "ioredis": "^4.28.5",
+    "js-md5": "^0.7.3",
+    "md5-node": "^1.0.1",
+    "mysql": "^2.18.1",
+    "redis": "^4.0.3",
+    "ws": "^8.4.2"
+  },
+  "devDependencies": {
+    "wscat": "^5.1.0"
+  }
+}
