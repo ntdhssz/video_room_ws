@@ -15,6 +15,7 @@ ws.on('connection', function (socket) {
         let roomId = request['room_id']
         let userId = request['user_id']
         socket['room_id'] = roomId
+        socket['user_id'] = userId
         switch (method) {
             case 'start':
                 if (typeof roomUser[roomId] === 'undefined') {
@@ -42,6 +43,7 @@ ws.on('connection', function (socket) {
                 }
                 roomUser[roomId][userId].send(JSON.stringify(startInfo))
                 redis.incr('video_room:room:watching:' + roomId)
+                socket['nick_name'] = request['nick_name']
                 break
             case 'now_time':
                 if (typeof roomState[roomId] === 'undefined') {
@@ -98,23 +100,25 @@ ws.on('connection', function (socket) {
                 roomState[roomId]['time'] = request['time']
                 break
             case 'close':
-                if (typeof roomUser[roomId] !== 'undefined') {
-                    if (typeof roomUser[roomId][userId] !== 'undefined') {
-                        delete roomUser[roomId][userId]
-                    }
-                    let closeInfo = {
-                        'method': 'user_leave',
-                        'user_id': userId,
-                        'nick_name': request['nick_name']
-                    }
-                    for (let key in roomUser[roomId]) {
-                        roomUser[roomId][key].send(JSON.stringify(closeInfo))
-                    }
-                }
                 break
         }
     })
     socket.on('close', function (close) {
+        let roomId = socket['room_id']
+        let userId = socket['user_id']
+        if (typeof roomUser[roomId] !== 'undefined') {
+            if (typeof roomUser[roomId][userId] !== 'undefined') {
+                delete roomUser[roomId][userId]
+            }
+            let closeInfo = {
+                'method': 'user_leave',
+                'user_id': userId,
+                'nick_name': socket['nick_name']
+            }
+            for (let key in roomUser[roomId]) {
+                roomUser[roomId][key].send(JSON.stringify(closeInfo))
+            }
+        }
         redis.decr('video_room:room:watching:' + socket['room_id'])
     })
 })
