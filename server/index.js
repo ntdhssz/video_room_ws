@@ -63,6 +63,51 @@ ws.on('connection', function (socket) {
                     roomState[roomId]['time'] = request['time']
                 }
                 break
+            case 'offer':
+                let offerInfo = {
+                    'method': 'offer',
+                    'user_id': userId,
+                    'desc': request['desc']
+                }
+                if (typeof roomUser[roomId] === 'undefined') {
+                    roomUser[roomId] = []
+                }
+                for (let key in roomUser[roomId]) {
+                    if (key !== userId) {
+                        roomUser[roomId][key].send(JSON.stringify(offerInfo))
+                    }
+                }
+                break
+            case 'answer':
+                let answerInfo = {
+                    'method': 'answer',
+                    'user_id': userId,
+                    'desc': request['desc']
+                }
+                if (typeof roomUser[roomId] === 'undefined') {
+                    roomUser[roomId] = []
+                }
+                for (let key in roomUser[roomId]) {
+                    if (key === request['to_user_id']) {
+                        roomUser[roomId][key].send(JSON.stringify(answerInfo))
+                    }
+                }
+                break
+            case 'candidate':
+                console.log('candidate')
+                let candidateInfo = {
+                    'method': 'candidate',
+                    'label': request['label'],
+                    'id': request['id'],
+                    'candidate': request['candidate']
+                }
+                for (let key in roomUser[roomId]) {
+                    console.log('send candidate:' + key + ' ' + userId)
+                    if (key !== userId) {
+                        roomUser[roomId][key].send(JSON.stringify(candidateInfo))
+                    }
+                }
+                break
             case 'chat':
                 let chatText = {
                     'method': 'chat',
