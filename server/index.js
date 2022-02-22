@@ -72,10 +72,8 @@ ws.on('connection', function (socket) {
                 if (typeof roomUser[roomId] === 'undefined') {
                     roomUser[roomId] = []
                 }
-                for (let key in roomUser[roomId]) {
-                    if (key !== userId) {
-                        roomUser[roomId][key].send(JSON.stringify(offerInfo))
-                    }
+                if (typeof roomUser[roomId][request['to_user_id']] !== 'undefined') {
+                    roomUser[roomId][request['to_user_id']].send(JSON.stringify(offerInfo))
                 }
                 break
             case 'answer':
@@ -87,25 +85,23 @@ ws.on('connection', function (socket) {
                 if (typeof roomUser[roomId] === 'undefined') {
                     roomUser[roomId] = []
                 }
-                for (let key in roomUser[roomId]) {
-                    if (key === request['to_user_id']) {
-                        roomUser[roomId][key].send(JSON.stringify(answerInfo))
-                    }
+                if (typeof roomUser[roomId][request['to_user_id']] !== 'undefined') {
+                    roomUser[roomId][request['to_user_id']].send(JSON.stringify(answerInfo))
                 }
                 break
             case 'candidate':
-                console.log('candidate')
                 let candidateInfo = {
                     'method': 'candidate',
+                    'user_id': userId,
                     'label': request['label'],
                     'id': request['id'],
                     'candidate': request['candidate']
                 }
-                for (let key in roomUser[roomId]) {
-                    console.log('send candidate:' + key + ' ' + userId)
-                    if (key !== userId) {
-                        roomUser[roomId][key].send(JSON.stringify(candidateInfo))
-                    }
+                if (typeof roomUser[roomId] === 'undefined') {
+                    roomUser[roomId] = []
+                }
+                if (typeof roomUser[roomId][request['to_user_id']] !== 'undefined') {
+                    roomUser[roomId][request['to_user_id']].send(JSON.stringify(candidateInfo))
                 }
                 break
             case 'chat':
